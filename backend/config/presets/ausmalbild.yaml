@@ -1,0 +1,20 @@
+# Standarddruckobjekt: Ausmalbild
+#
+# Druckt ein zufaellig ausgewaehltes Tiermotiv aus assets/images/animals.png
+# zum Ausmalen. Das Motiv wird bei jedem Druck per content-/Bild-Skript neu
+# ausgewuerfelt (siehe app/presets/scripts/random_animal.py).
+
+name: "Ausmalbild"
+description: "Druckt ein zufaelliges Tier zum Ausmalen"
+icon: "fa-paw"
+template: "gemaelde"
+category: "Kinder"
+
+title: "Ausmalbild"
+content: " \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n "
+
+attachment:
+  type: "image"
+  script: "random_animal"
+
+print_timestamp: true

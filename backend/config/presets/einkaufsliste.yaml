@@ -1,0 +1,18 @@
+# Standarddruckobjekt: Einkaufsliste aus Mealie
+#
+# Der Inhalt wird vom Skript app/presets/scripts/mealie_shopping_list.py
+# erzeugt: laedt die offenen Positionen der Mealie-Einkaufsliste. Erfordert
+# die Umgebungsvariablen MEALIE_BASE_URL/MEALIE_API_TOKEN (siehe
+# .env.example); MEALIE_SHOPPING_LIST_ID ist optional.
+
+name: "Einkaufsliste"
+description: "Offene Positionen der Einkaufsliste aus Mealie"
+icon: "fa-cart-shopping"
+template: "todo"
+category: "Haushalt"
+
+title: "Einkaufsliste"
+content_script: "mealie_shopping_list"
+config_keys: ["mealie_base_url", "mealie_api_token", "mealie_shopping_list_id"]
+
+print_timestamp: true

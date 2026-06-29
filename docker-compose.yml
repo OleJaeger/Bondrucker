@@ -1,0 +1,71 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    image: bondrucker-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # SQLite database - persists across container recreation/restarts.
+      - ./backend/data:/data
+      # Application logs.
+      - ./backend/logs:/app/logs
+      # Print templates (YAML) - edit/add files here without rebuilding the
+      # image. Mounted read-only; the backend only reads these at startup.
+      - ./backend/config/templates:/app/config/templates:ro
+      # Standarddruckobjekte (Presets, YAML) - edit/add files here without
+      # rebuilding the image. Mounted read-only; the backend only reads
+      # these at startup.
+      - ./backend/config/presets:/app/config/presets:ro
+      # Font Awesome webfont + icon map for header icons (not shipped in the
+      # image for licensing reasons - see backend/assets/fontawesome/README.md).
+      - ./backend/assets/fontawesome:/app/assets/fontawesome:ro
+      # Custom SVG icons - edit/add files here without rebuilding the image.
+      # Mounted read-only; the backend only reads these at startup. See
+      # backend/assets/icons/README.md.
+      - ./backend/assets/icons:/app/assets/icons:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.bondrucker-backend.rule=Host(`${BONDRUCKER_BACKEND_URL}`)"
+      - "traefik.http.routers.bondrucker-backend.entrypoints=websecure"
+      - "traefik.http.routers.bondrucker-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.bondrucker-backend.loadbalancer.server.port=8000"
+    networks:
+      - web
+
+  frontend:
+    build:
+      context: ./frontend
+    image: bondrucker-frontend
+    restart: unless-stopped
+    environment:
+      # URL the nginx reverse proxy forwards "/api" and "/health" to.
+      # Routed via Docker-internal DNS, not the public Traefik domain, to
+      # avoid depending on Traefik/Let's Encrypt being ready for
+      # BONDRUCKER_BACKEND_URL at frontend container startup.
+      BACKEND_URL: http://backend:8000
+      # Same secret as the backend's API_KEY (see .env). nginx attaches it to
+      # proxied "/api/" requests - the frontend is gated by Authentik, so
+      # browsers never need to know this key.
+      API_KEY: ${API_KEY}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.bondrucker-frontend.rule=Host(`${BONDRUCKER_FRONTEND_URL}`)"
+      - "traefik.http.routers.bondrucker-frontend.entrypoints=websecure"
+      - "traefik.http.routers.bondrucker-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.bondrucker-frontend.loadbalancer.server.port=80"
+      - 'traefik.http.routers.bondrucker-frontend.middlewares=authentik-forwardauth@file'
+    networks:
+      - web
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  web:
+    external: true

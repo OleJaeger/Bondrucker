@@ -1,0 +1,14 @@
+# Standarddruckobjekt: Kühlschrank Kunst
+#
+# Platz für ein kleines Kunstwerk
+
+name: "Kühlschrank-Kunst"
+description: "Platz für ein kleines Kunstwerk"
+icon: "svg-hummel"
+template: "gemaelde"
+category: "Kinder"
+
+title: "Kühlschrank-Kunst"
+content: " \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n "
+
+print_timestamp: true

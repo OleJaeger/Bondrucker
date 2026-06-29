@@ -1,0 +1,18 @@
+# Standarddruckobjekt: Wettervorhersage fuer Heute
+#
+# Der Inhalt wird vom Skript app/presets/scripts/weather_forecast.py erzeugt:
+# liest aktuelle Messwerte und Vorhersage ueber HomeAssistant-Sensoren
+# (HOMEASSISTANT_URL/HOMEASSISTANT_TOKEN, siehe .env.example).
+# WEATHER_LOCATION_NAME bestimmt die Ueberschrift (Default Berlin).
+
+name: "Wettervorhersage"
+description: "Wettervorhersage fuer heute"
+icon: "fa-cloud-sun"
+template: "freitext"
+category: "Information"
+
+title: "Wettervorhersage"
+content_script: "weather_forecast"
+config_keys: ["homeassistant_url", "homeassistant_token", "weather_location_name"]
+
+print_timestamp: true

@@ -1,0 +1,25 @@
+# Vorlage: Aufgabenliste (Todo)
+#
+# Fuer Checklisten / Einkaufslisten. Erwartet Markdown mit Checkbox-Syntax
+# ("- [ ] ..." / "- [x] ..."), unterstuetzt aber alle generischen
+# Markdown-Elemente wie jede andere Vorlage.
+
+name: "Nachricht"
+type: "message"
+
+layout:
+  width_chars: 48
+  cut: true
+  feed_lines: 4
+
+default_formatting:
+  title:
+    align: center
+    bold: true
+    double_width: true
+    double_height: true
+  body:
+    align: center
+
+# Standard-Icon, falls der Druckauftrag kein eigenes "icon" angibt.
+icon: "fa-heart"

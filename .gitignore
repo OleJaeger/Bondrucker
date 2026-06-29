@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Backend runtime data (DB, logs) - persisted via Docker volumes, not in VCS
+backend/data/*.db
+backend/data/*.db-journal
+backend/data/*.db-wal
+backend/data/*.db-shm
+backend/logs/*.log
+
+# Eigene Presets/Vorlagen/Skripte (siehe backend/*/custom/README.md) - lokal,
+# nicht versioniert (z. B. weil sie private Daten/Zugangsdaten enthalten)
+backend/app/presets/scripts/custom/*
+!backend/app/presets/scripts/custom/__init__.py
+!backend/app/presets/scripts/custom/README.md
+backend/config/presets/custom/*
+!backend/config/presets/custom/README.md
+backend/config/templates/custom/*
+!backend/config/templates/custom/README.md
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# Env files with secrets
+.env
+*.env.local
+
+# ClaudeKanboard
+.board.yaml
+.current-task.json
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Claude Code
+CLAUDE.md
+.claude

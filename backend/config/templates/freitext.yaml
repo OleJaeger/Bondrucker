@@ -1,0 +1,30 @@
+# Vorlage: Freitext
+#
+# Allgemeine Vorlage fuer beliebige Markdown-Inhalte (Notizen, Mitteilungen,
+# Belege ohne festes Schema). "key" = Dateiname ohne Endung ("freitext")
+# und wird im Druckauftrag als "template" referenziert.
+
+name: "Freitext"
+type: "freitext"
+
+layout:
+  # Zeichen pro Zeile (Font A, 80mm). null = globalen Default verwenden.
+  width_chars: 48
+  # Papier nach dem Druck abschneiden.
+  cut: true
+  # Leerzeilen-Vorschub vor dem Schnitt.
+  feed_lines: 3
+
+default_formatting:
+  title:
+    align: center
+    bold: true
+    double_width: true
+    double_height: true
+  body:
+    align: left
+
+# Optionales Standard-Icon (Font Awesome), wird gedruckt, falls der
+# Druckauftrag selbst kein "icon" angibt. Freitext hat standardmaessig
+# kein Icon.
+icon: null

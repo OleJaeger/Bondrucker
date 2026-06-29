@@ -1,0 +1,6 @@
+{
+  "template": "todo",
+  "title": "Einkaufsliste",
+  "icon": "fa-cart-shopping",
+  "markdown": "# Aufgaben\n\n- [ ] Milch\n- [x] Brot"
+}

@@ -1,0 +1,19 @@
+# Standarddruckobjekt: Heutige Aufgaben aus Super Productivity
+#
+# Der Inhalt wird vom Skript
+# app/presets/scripts/super_productivity_today.py erzeugt: liest die
+# WebDAV-Sync-Datei von Super Productivity und listet alle heute faelligen,
+# offenen Aufgaben auf. Erfordert die Umgebungsvariablen
+# SP_WEBDAV_URL/SP_WEBDAV_USERNAME/SP_WEBDAV_PASSWORD (siehe .env.example).
+
+name: "Heutige Aufgaben"
+description: "Heute faellige, offene Aufgaben aus Super Productivity"
+icon: "fa-list-check"
+template: "todo"
+category: "Haushalt"
+
+title: "Heutige Aufgaben"
+content_script: "super_productivity_today"
+config_keys: ["sp_webdav_url", "sp_webdav_username", "sp_webdav_password", "sp_sync_path"]
+
+print_timestamp: true

@@ -1,0 +1,839 @@
+openapi: 3.1.0
+info:
+  title: Bondrucker API
+  description: REST-API zur Verwaltung und Ausfuehrung von ESC/POS-Druckauftraegen
+    fuer einen netzwerkfaehigen V330M 80mm Thermodrucker.
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      tags:
+      - health
+      summary: Liveness check
+      description: Simple liveness probe. Does not require an API key.
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+                title: Response Health Health Get
+  /api/icons:
+    get:
+      tags:
+      - icons
+      summary: List Icons
+      description: 'List the icon names available for print jobs.
+
+
+        Includes both Font Awesome icon names (e.g. ``fa-cart-shopping``) and
+
+        custom SVG icons (e.g. ``svg-logo``). Used by the frontend to populate a
+
+        searchable icon picker. Font Awesome names are empty if the Font Awesome
+
+        assets are not configured (see ``backend/assets/fontawesome/README.md``).'
+      operationId: list_icons_api_icons_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+                title: Response List Icons Api Icons Get
+      security:
+      - APIKeyHeader: []
+  /api/icons/{name}/svg:
+    get:
+      tags:
+      - icons
+      summary: Get Icon Svg
+      description: 'Return the raw SVG file for a custom icon (e.g. ``svg-logo``).
+
+
+        Used by the frontend icon picker to render a preview of custom icons,
+
+        which (unlike Font Awesome icons) have no CSS glyph to display. 404 if
+
+        ``name`` is not a known custom icon (see
+
+        ``backend/assets/icons/README.md``).'
+      operationId: get_icon_svg_api_icons__name__svg_get
+      security:
+      - APIKeyHeader: []
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/jobs:
+    post:
+      tags:
+      - jobs
+      summary: Create Job
+      description: 'Validate and enqueue a new print job.
+
+
+        The template and markdown are validated eagerly so the client gets an
+
+        immediate ``400`` for an unknown template or unparsable markdown,
+
+        instead of the job silently failing in the queue.'
+      operationId: create_job_api_jobs_post
+      security:
+      - APIKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintJobCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintJobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+      - jobs
+      summary: List Jobs
+      operationId: list_jobs_api_jobs_get
+      security:
+      - APIKeyHeader: []
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/JobStatus'
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrintJobResponse'
+                title: Response List Jobs Api Jobs Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/jobs/{job_id}:
+    get:
+      tags:
+      - jobs
+      summary: Get Job
+      operationId: get_job_api_jobs__job_id__get
+      security:
+      - APIKeyHeader: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintJobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - jobs
+      summary: Cancel Job
+      description: 'Cancel a queued or failed job.
+
+
+        Jobs that are already printing, completed or cancelled cannot be
+
+        cancelled and result in ``409 Conflict``.'
+      operationId: cancel_job_api_jobs__job_id__delete
+      security:
+      - APIKeyHeader: []
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintJobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/presets:
+    get:
+      tags:
+      - presets
+      summary: List Presets
+      description: List the configured standard print objects (Standarddruckobjekte).
+      operationId: list_presets_api_presets_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PresetInfo'
+                type: array
+                title: Response List Presets Api Presets Get
+      security:
+      - APIKeyHeader: []
+  /api/presets/{key}/print:
+    post:
+      tags:
+      - presets
+      summary: Print Preset
+      description: 'Resolve a preset to a print job and enqueue it.
+
+
+        The preset''s content script (if any) runs eagerly, and the resulting
+
+        payload is validated the same way as ``POST /api/jobs`` so an unknown
+
+        template or invalid content never reaches the queue.'
+      operationId: print_preset_api_presets__key__print_post
+      security:
+      - APIKeyHeader: []
+      parameters:
+      - name: key
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Key
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintJobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/preview:
+    post:
+      tags:
+      - preview
+      summary: Preview
+      description: 'Render a print job payload to a PNG preview without enqueueing
+        it.
+
+
+        Uses the same layout engine as the ESC/POS renderer, so the preview
+
+        matches the printed receipt.'
+      operationId: preview_api_preview_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintJobCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            image/png: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - APIKeyHeader: []
+  /api/printer/status:
+    get:
+      tags:
+      - printer
+      summary: Printer Status
+      description: Report printer connectivity and the current queue state.
+      operationId: printer_status_api_printer_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrinterStatusResponse'
+      security:
+      - APIKeyHeader: []
+  /api/printer/power:
+    get:
+      tags:
+      - printer
+      summary: Printer Power
+      description: Return the current power state of the printer plug (``switch.plug_016``
+        by default).
+      operationId: printer_power_api_printer_power_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrinterPowerResponse'
+      security:
+      - APIKeyHeader: []
+  /api/printer/power/toggle:
+    post:
+      tags:
+      - printer
+      summary: Printer Power Toggle
+      description: Toggle the printer plug via Home Assistant and return the new power
+        state.
+      operationId: printer_power_toggle_api_printer_power_toggle_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrinterPowerResponse'
+      security:
+      - APIKeyHeader: []
+  /api/settings:
+    get:
+      tags:
+      - settings
+      summary: List Settings
+      description: List all web-configurable settings fields and their current/effective
+        values.
+      operationId: list_settings_api_settings_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SettingFieldInfo'
+                type: array
+                title: Response List Settings Api Settings Get
+      security:
+      - APIKeyHeader: []
+    put:
+      tags:
+      - settings
+      summary: Update Settings
+      description: 'Update one or more settings fields.
+
+
+        ``payload`` is sparse - only keys to change need to be included. A value
+
+        of ``null`` removes the web-configured override (reverts to default).
+
+        Fields locked by the environment/.env cannot be changed here.'
+      operationId: update_settings_api_settings_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties:
+                anyOf:
+                - type: string
+                - type: integer
+                - type: 'null'
+              type: object
+              title: Payload
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SettingFieldInfo'
+                type: array
+                title: Response Update Settings Api Settings Put
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - APIKeyHeader: []
+  /api/table/parse:
+    post:
+      tags:
+      - table
+      summary: Parse Table
+      description: 'Parse an uploaded CSV or XLSX file and convert it to a Markdown
+        table.
+
+
+        Returns ``{ markdown, rows, columns, warnings }``.  Raises 400 if the
+
+        file format is unsupported, the file is too large, empty, or has too many
+
+        columns to fit on an 80 mm thermal printer.'
+      operationId: parse_table_api_table_parse_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_parse_table_api_table_parse_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - APIKeyHeader: []
+  /api/templates:
+    get:
+      tags:
+      - templates
+      summary: List Templates
+      description: 'List the configured print templates (key, display name, type,
+        icon).
+
+
+        Used by the frontend to populate the template selector when creating a
+
+        new print job, without hardcoding the set of available templates.'
+      operationId: list_templates_api_templates_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/TemplateInfo'
+                type: array
+                title: Response List Templates Api Templates Get
+      security:
+      - APIKeyHeader: []
+components:
+  schemas:
+    Body_parse_table_api_table_parse_post:
+      properties:
+        file:
+          type: string
+          format: binary
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_parse_table_api_table_parse_post
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    JobStatus:
+      type: string
+      enum:
+      - queued
+      - printing
+      - failed
+      - completed
+      - cancelled
+      title: JobStatus
+    PresetInfo:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        description:
+          type: string
+          title: Description
+        icon:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Icon
+        template:
+          type: string
+          title: Template
+        category:
+          type: string
+          title: Category
+      type: object
+      required:
+      - key
+      - name
+      - description
+      - template
+      - category
+      title: PresetInfo
+      description: Response body item for ``GET /api/presets``.
+    PrintJobCreate:
+      properties:
+        template:
+          type: string
+          minLength: 1
+          title: Template
+          description: Key of a configured template, e.g. 'todo'
+        title:
+          type: string
+          title: Title
+          description: Title printed above the content
+          default: ''
+        icon:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Icon
+          description: Icon name, e.g. 'fa-cart-shopping' (Font Awesome) or 'svg-logo'
+            (custom SVG)
+        markdown:
+          type: string
+          title: Markdown
+          description: Markdown content of the print job
+          default: ''
+        print_timestamp:
+          type: boolean
+          title: Print Timestamp
+          description: Whether to print the current date/time in the bottom-right
+            corner
+          default: true
+        image_base64:
+          anyOf:
+          - type: string
+            maxLength: 7000000
+          - type: 'null'
+          title: Image Base64
+          description: Base64-encoded image (optionally a 'data:' URL), printed after
+            the title as black & white. Mutually exclusive with qr_code.
+        qr_code:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Qr Code
+          description: Content to encode as a QR code (URL, WLAN, vCard, geo-location,
+            ...), printed after the title. Mutually exclusive with image_base64.
+      type: object
+      required:
+      - template
+      title: PrintJobCreate
+      description: Request body for ``POST /api/jobs`` and ``POST /api/preview``.
+      examples:
+      - icon: fa-cart-shopping
+        markdown: '# Aufgaben
+
+
+          - [ ] Milch
+
+          - [x] Brot'
+        print_timestamp: true
+        template: todo
+        title: Einkaufsliste
+    PrintJobResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+        completed_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Completed At
+        retry_count:
+          type: integer
+          title: Retry Count
+        error_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Message
+        template:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Template
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        icon:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Icon
+        markdown:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Markdown
+        print_timestamp:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Print Timestamp
+        image_base64:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Image Base64
+        qr_code:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Qr Code
+      type: object
+      required:
+      - id
+      - status
+      - created_at
+      - updated_at
+      - retry_count
+      title: PrintJobResponse
+      description: 'Response body for job endpoints.
+
+
+        For jobs in a terminal ``completed`` state, ``template``/``title``/
+
+        ``icon``/``markdown``/``error_message`` are always ``null`` - their
+
+        content is scrubbed from the database on success (privacy by design).'
+    PrinterPowerResponse:
+      properties:
+        power:
+          type: boolean
+          title: Power
+      type: object
+      required:
+      - power
+      title: PrinterPowerResponse
+      description: Response body for ``GET /api/printer/power`` and ``POST /api/printer/power/toggle``.
+    PrinterStatusResponse:
+      properties:
+        online:
+          type: boolean
+          title: Online
+        queue_length:
+          type: integer
+          title: Queue Length
+        current_job:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Current Job
+      type: object
+      required:
+      - online
+      - queue_length
+      title: PrinterStatusResponse
+      description: Response body for ``GET /api/printer/status``.
+    SettingFieldInfo:
+      properties:
+        key:
+          type: string
+          title: Key
+        group:
+          type: string
+          title: Group
+        label:
+          type: string
+          title: Label
+        type:
+          type: string
+          title: Type
+        secret:
+          type: boolean
+          title: Secret
+        locked:
+          type: boolean
+          title: Locked
+        value:
+          anyOf:
+          - type: string
+          - type: integer
+          - type: 'null'
+          title: Value
+        is_set:
+          type: boolean
+          title: Is Set
+        default:
+          anyOf:
+          - type: string
+          - type: integer
+          - type: 'null'
+          title: Default
+        used_by_presets:
+          items:
+            type: string
+          type: array
+          title: Used By Presets
+      type: object
+      required:
+      - key
+      - group
+      - label
+      - type
+      - secret
+      - locked
+      - value
+      - is_set
+      - default
+      - used_by_presets
+      title: SettingFieldInfo
+      description: 'Response body item for ``GET``/``PUT /api/settings``.
+
+
+        One entry per ``app.config.WEB_SETTINGS_FIELDS`` field. Secret fields
+
+        never carry their actual value - ``is_set`` indicates whether one is
+
+        configured, and a new value can be written without ever reading the old
+
+        one back.'
+    TemplateInfo:
+      properties:
+        key:
+          type: string
+          title: Key
+        name:
+          type: string
+          title: Name
+        type:
+          type: string
+          title: Type
+        icon:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Icon
+        allow_markdown:
+          type: boolean
+          title: Allow Markdown
+          default: true
+        allow_attachment:
+          type: boolean
+          title: Allow Attachment
+          default: true
+        default_markdown:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Default Markdown
+      type: object
+      required:
+      - key
+      - name
+      - type
+      title: TemplateInfo
+      description: 'Response body item for ``GET /api/templates``.
+
+
+        Lets the frontend populate the "create job" form without hardcoding
+
+        the set of available templates.'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    APIKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
