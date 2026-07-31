@@ -1,0 +1,12 @@
+{
+  "domain": "bondrucker",
+  "name": "Bondrucker",
+  "version": "1.0.2",
+  "iot_class": "local_polling",
+  "config_flow": true,
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@olejaeger"],
+  "documentation": "https://github.com/OleJaeger/Bondrucker/tree/main/scripts/homeassistant",
+  "issue_tracker": "https://github.com/OleJaeger/Bondrucker/issues"
+}

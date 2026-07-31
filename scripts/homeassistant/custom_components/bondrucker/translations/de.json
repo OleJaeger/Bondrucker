@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bondrucker verbinden",
+        "description": "Gib die URL und den API-Schlüssel deines Bondrucker-Servers ein.",
+        "data": {
+          "host": "Host-URL (z.B. http://192.168.1.100:8000)",
+          "api_key": "API-Schlüssel",
+          "scan_interval": "Abfrageintervall (Sekunden)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen. Prüfe Host-URL und Netzwerk.",
+      "invalid_auth": "Ungültiger API-Schlüssel.",
+      "unknown": "Unbekannter Fehler."
+    },
+    "abort": {
+      "already_configured": "Bondrucker ist bereits konfiguriert."
+    }
+  }
+}

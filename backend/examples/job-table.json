@@ -1,0 +1,6 @@
+{
+  "template": "freitext",
+  "title": "Tagesbericht",
+  "icon": "fa-clipboard",
+  "markdown": "## Übersicht\n\n| Artikel | Menge | Preis |\n| --- | ---: | ---: |\n| Kaffee | 12 | 2,50 € |\n| Tee | 5 | 2,00 € |\n| Gebäck | 8 | 1,80 € |\n\n---\n\n**Gesamt: 47,40 €**"
+}

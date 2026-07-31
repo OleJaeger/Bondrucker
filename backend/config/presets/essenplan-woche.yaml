@@ -1,0 +1,18 @@
+# Standarddruckobjekt: Essenplan der aktuellen Woche aus Mealie
+#
+# Der Inhalt wird vom Skript app/presets/scripts/mealie_mealplan.py erzeugt:
+# laedt den Essenplan (Montag bis Sonntag der aktuellen Woche) aus Mealie.
+# Nutzt dieselben Einstellungen wie die Einkaufsliste
+# (MEALIE_BASE_URL/MEALIE_API_TOKEN, siehe .env.example).
+
+name: "Essenplan (Woche)"
+description: "Essenplan der aktuellen Woche aus Mealie"
+icon: "fa-calendar-week"
+template: "freitext"
+category: "Haushalt"
+
+title: "Essenplan"
+content_script: "mealie_mealplan"
+config_keys: ["mealie_base_url", "mealie_api_token"]
+
+print_timestamp: true

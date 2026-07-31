@@ -1,0 +1,26 @@
+# Standarddruckobjekt: WLAN-QRCode mit Nachricht
+#
+# Statisches Preset (kein Skript) - druckt einen QR-Code mit den
+# WLAN-Zugangsdaten sowie eine kurze Nachricht. SSID/Passwort bitte an das
+# eigene Netzwerk anpassen.
+
+name: "WLAN-Zugang"
+description: "QR-Code mit WLAN-Zugangsdaten zum Einscannen"
+icon: "fa-wifi"
+template: "message"
+category: "Information"
+
+title: "WLAN-Zugang"
+content: |
+  Hallo und willkommen!
+
+  Scanne den QR-Code, um dich automatisch mit unserem Gast-WLAN zu verbinden.
+
+  Schön, dass du da bist!
+
+attachment:
+  type: "qr_code"
+  # Format: WIFI:T:<Verschluesselung>;S:<SSID>;P:<Passwort>;;
+  content: "WIFI:T:WPA2;S:Guest-WLAN;P:changeme123;;"
+
+print_timestamp: true

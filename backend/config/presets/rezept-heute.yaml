@@ -1,0 +1,23 @@
+# Standarddruckobjekt: Heutiges Rezept aus Mealie (Bild + Anleitung)
+#
+# Inhalt und Bild werden vom Skript app/presets/scripts/mealie_recipe_today.py
+# erzeugt: laedt das erste fuer heute im Essenplan hinterlegte Rezept aus
+# Mealie (Zutaten/Zubereitung als Text, Rezeptfoto als Anhang). Nutzt
+# dieselben Einstellungen wie Einkaufsliste/Essenplan (Woche)
+# (MEALIE_BASE_URL/MEALIE_API_TOKEN, siehe .env.example).
+
+name: "Rezept (heute)"
+description: "Heutiges Rezept aus Mealie mit Bild und Anleitung"
+icon: "fa-utensils"
+template: "freitext"
+category: "Haushalt"
+
+title: "Rezept"
+content_script: "mealie_recipe_today"
+config_keys: ["mealie_base_url", "mealie_api_token"]
+
+attachment:
+  type: "image"
+  script: "mealie_recipe_today"
+
+print_timestamp: true

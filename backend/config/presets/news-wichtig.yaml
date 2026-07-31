@@ -1,0 +1,27 @@
+# Standarddruckobjekt: Wichtige Nachrichten aus dem News-Aggregator
+#
+# Der Inhalt wird vom Skript app/presets/scripts/news_important.py erzeugt:
+# authentifiziert sich per OAuth2-Client-Credentials-Flow gegen Authentik
+# (NEWS_AUTHENTIK_TOKEN_URL/NEWS_CLIENT_ID/NEWS_AUTHENTIK_USERNAME/
+# NEWS_AUTHENTIK_PASSWORD, siehe Kommentar im Skript zur Authentik-
+# Besonderheit bei Client-Credentials) und laedt die obersten, bereits nach
+# Score priorisierten Eintraege von GET /api/v1/news des News-Aggregators
+# (NEWS_BASE_URL).
+
+name: "Wichtige Nachrichten"
+description: "Die wichtigsten Nachrichten aus dem News-Aggregator"
+icon: "fa-newspaper"
+template: "freitext"
+category: "Information"
+
+title: "Wichtige Nachrichten"
+content_script: "news_important"
+config_keys: [
+  "news_base_url",
+  "news_authentik_token_url",
+  "news_client_id",
+  "news_authentik_username",
+  "news_authentik_password",
+]
+
+print_timestamp: true

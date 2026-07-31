@@ -1,0 +1,19 @@
+# Standarddruckobjekt: Jagdtag (heute)
+#
+# Der Inhalt wird vom Skript app/presets/scripts/jagdtag_heute.py erzeugt:
+# heute jagdbares Haar- und Federwild aus der PostgreSQL-Tabelle
+# "jagdzeiten" (siehe JAGD_DB_* in .env.example) sowie Wetter, Windrichtung
+# und Sonnenuntergang ueber HomeAssistant-Sensoren (HOMEASSISTANT_URL/
+# HOMEASSISTANT_TOKEN).
+
+name: "Jagdtag (heute)"
+description: "Heute jagdbares Wild, Wetter, Windrichtung und Sonnenuntergang"
+icon: "fa-tree"
+template: "freitext"
+category: "Jagd"
+
+title: "Waidmannsheil"
+content_script: "jagdtag_heute"
+config_keys: ["jagd_db_host", "jagd_db_port", "jagd_db_name", "jagd_db_user", "jagd_db_password", "homeassistant_url", "homeassistant_token"]
+
+print_timestamp: true

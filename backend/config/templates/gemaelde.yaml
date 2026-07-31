@@ -1,0 +1,34 @@
+# Vorlage: Gemaelde
+#
+# Vorlage mit festem Layout fuer eigene Zeichnungen auf dem Ausdruck: Das
+# Textfeld und der Anhang sind im Erstellungsformular deaktiviert, nur
+# Ueberschrift, Icon und Datum/Uhrzeit lassen sich anpassen. Der Inhalt ist
+# fest auf mehrere leere Absaetze gesetzt (" " = geschuetztes
+# Leerzeichen, damit die Zeilen nicht als reine Markdown-Leerzeilen
+# verschluckt werden), die beim Drucken als freie Flaeche zum Malen dienen.
+
+name: "Gemälde"
+type: "gemaelde"
+
+layout:
+  width_chars: 48
+  cut: true
+  feed_lines: 4
+
+default_formatting:
+  title:
+    align: center
+    bold: true
+    double_width: true
+    double_height: true
+  body:
+    align: left
+
+# Standard-Icon, falls der Druckauftrag kein eigenes "icon" angibt.
+icon: "svg-hummel"
+
+fields:
+  markdown: false
+  attachment: false
+
+default_markdown: " \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n "

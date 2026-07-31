@@ -1,0 +1,15 @@
+# Standarddruckobjekt: Positive Nachricht mit Icon
+#
+# Der Inhalt wird vom Skript app/presets/scripts/positive_message.py erzeugt
+# (zufaellig ausgewaehlter, aufmunternder Satz).
+
+name: "Grundsätze der IT"
+description: "Druckt eine zufaellige, IT Grundsatz aus"
+icon: "fa-server"
+template: "message"
+category: "Nachrichten"
+
+title: ""
+content_script: "tenets_of_it"
+
+print_timestamp: true
